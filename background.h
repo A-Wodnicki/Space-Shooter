@@ -5,8 +5,7 @@
 
 class Background {
  public:
-  Background(const sf::RenderWindow& window,
-             const std::unique_ptr<sf::Texture>& texture);
+  Background(sf::RenderWindow& window, const sf::Texture& texture);
   void scroll(sf::RenderWindow& window, const sf::Time& elapsed);
   void set_scroll_speed(const float& speed);
 

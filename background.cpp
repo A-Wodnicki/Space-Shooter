@@ -1,12 +1,11 @@
 #include "background.h"
 
-Background::Background(const sf::RenderWindow& window,
-                       const std::unique_ptr<sf::Texture>& texture) {
+Background::Background(sf::RenderWindow& window, const sf::Texture& texture) {
   background_sprites.emplace_back(std::make_unique<sf::Sprite>());
   background_sprites.emplace_back(std::make_unique<sf::Sprite>());
 
   for (auto& background_sprite : background_sprites) {
-    background_sprite->setTexture(*texture);
+    background_sprite->setTexture(texture);
     background_sprite->setTextureRect({0, 0,
                                        static_cast<int>(window.getSize().x),
                                        static_cast<int>(window.getSize().y)});
@@ -25,7 +24,6 @@ void Background::scroll(sf::RenderWindow& window, const sf::Time& elapsed) {
     background_sprite->move(0, scroll_speed * elapsed.asSeconds());
     window.draw(*background_sprite);
   }
-  return;
 }
 
 void Background::set_scroll_speed(const float& speed) {

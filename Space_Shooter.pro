@@ -4,6 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+    game.cpp \
     main.cpp \
     background.cpp
 INCLUDEPATH += "D:/SFML-2.5.1/include"
@@ -15,9 +16,12 @@ CONFIG(debug, debug|release){
 }
 
 DISTFILES += \
-    assets/images/blue.png
+    README.md \
+    assets/images/blue.png \
+    assets/images/ship.png
 
 HEADERS += \
-    background.h
+    background.h \
+    game.h
 
 
