@@ -4,10 +4,15 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-    game.cpp \
-    main.cpp \
-    background.cpp
-INCLUDEPATH += "D:/SFML-2.5.1/include"
+    Sources/background.cpp \
+    Sources/game.cpp \
+    Sources/main.cpp
+
+INCLUDEPATH += \
+    "D:/SFML-2.5.1/include" \
+    "Sources/" \
+    "Headers/"
+
 LIBS += -L"D:/SFML-2.5.1/lib"
 CONFIG(debug, debug|release){
     LIBS += -lsfml-audio-d -lsfml-graphics-d -lsfml-network-d -lsfml-system-d -lsfml-window-d
@@ -17,11 +22,11 @@ CONFIG(debug, debug|release){
 
 DISTFILES += \
     README.md \
-    assets/images/blue.png \
-    assets/images/ship.png
+    Assets/Images/blue.png \
+    Assets/Images/ship.png
 
 HEADERS += \
-    background.h \
-    game.h
+    Headers/background.h \
+    Headers/game.h
 
 
