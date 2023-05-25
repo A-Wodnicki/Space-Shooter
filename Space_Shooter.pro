@@ -6,7 +6,9 @@ CONFIG -= qt
 SOURCES += \
     Sources/background.cpp \
     Sources/game.cpp \
-    Sources/main.cpp
+    Sources/main.cpp \
+    Sources/playership.cpp \
+    Sources/projectile.cpp
 
 INCLUDEPATH += \
     "D:/SFML-2.5.1/include" \
@@ -21,12 +23,15 @@ CONFIG(debug, debug|release){
 }
 
 DISTFILES += \
+    Assets/Images/laserBlue01.png \
     README.md \
     Assets/Images/blue.png \
     Assets/Images/ship.png
 
 HEADERS += \
     Headers/background.h \
-    Headers/game.h
+    Headers/game.h \
+    Headers/playership.h \
+    Headers/projectile.h
 
 

@@ -1,5 +1,6 @@
 #include "game.h"
 #include <iostream>
+#include "projectile.h"
 
 Game::Game() {
   ::ShowWindow(window.getSystemHandle(), SW_MAXIMIZE);
@@ -19,8 +20,8 @@ Game::Game() {
     window.close();
   textures["ship"] = std::move(texture);
 
-  ship = std::make_unique<sf::Sprite>();
-  ship->setTexture(*textures["ship"]);
+  ship = std::make_unique<sf::Sprite>(*textures["ship"]);
+
   animation_frames.emplace_back(
       0, 0, static_cast<int>(ship->getLocalBounds().width) / 4,
       static_cast<int>(ship->getLocalBounds().height));
@@ -41,6 +42,15 @@ Game::Game() {
                         static_cast<int>(ship->getLocalBounds().height)});
   ship->setPosition(window.getSize().x / 2, window.getSize().y / 4 * 3);
   ship->setOrigin(ship->getGlobalBounds().width / 2, 0);
+
+  texture = std::make_unique<sf::Texture>();
+  if (!texture->loadFromFile("assets/images/laserBlue01.png"))
+    window.close();
+  textures["projectile"] = std::move(texture);
+
+  for (auto& [key, value] : textures) {
+    value->setSmooth(true);
+  }
 }
 
 void Game::loop() {
@@ -106,8 +116,27 @@ void Game::loop() {
       ship->move(0, ship_speed_y * elapsed.asSeconds());
     }
 
-    window.draw(*ship);
+    updateProjectiles(elapsed);
 
     window.display();
+  }
+}
+
+void Game::updateProjectiles(const sf::Time& elapsed) {
+  projectiles.erase(
+      std::remove_if(projectiles.begin(), projectiles.end(),
+                     [](const std::unique_ptr<Projectile>& projectile) {
+                       return projectile->isMarkedMarkedForDeletion();
+                     }),
+      projectiles.end());
+  projectiles.shrink_to_fit();
+  for (auto& projectile : projectiles) {
+    sf::Vector2f projectile_position = projectile->getPosition();
+    if (projectile_position.x < 0 ||
+        projectile_position.x > window.getSize().x ||
+        projectile_position.y < 0 || projectile_position.y > window.getSize().y)
+      projectile->markForDeletion();
+    projectile->update(elapsed.asSeconds());
+    window.draw(*projectile);
   }
 }
