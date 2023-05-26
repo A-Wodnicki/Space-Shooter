@@ -1,3 +1,3 @@
-#include "playership.h"
+#include "playership.hpp"
 
 PlayerShip::PlayerShip() {}

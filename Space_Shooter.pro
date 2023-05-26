@@ -29,9 +29,9 @@ DISTFILES += \
     Assets/Images/ship.png
 
 HEADERS += \
-    Headers/background.h \
-    Headers/game.h \
-    Headers/playership.h \
-    Headers/projectile.h
+    Headers/background.hpp \
+    Headers/game.hpp \
+    Headers/playership.hpp \
+    Headers/projectile.hpp
 
 

@@ -1,14 +1,12 @@
-#include "projectile.h"
+#include "projectile.hpp"
 
 Projectile::Projectile(const sf::Texture& texture,
                        const float& speed,
-                       float angle,
-                       int damage,
-                       bool isPlayer,
+                       const float& angle,
+                       const int& damage,
+                       const bool& isPlayer,
                        const sf::Vector2f& startingPosition)
-    : velocity(sf::Vector2f(speed * std::sin(angle * M_PI / 180.f),
-                            -speed * std::cos(angle * M_PI / 180.f))),
-      damage(damage),
+    : damage(damage),
       playerProjectile(isPlayer),
       markedForDeletion(false),
       bright(false) {
@@ -16,9 +14,13 @@ Projectile::Projectile(const sf::Texture& texture,
   setOrigin(getLocalBounds().width / 2.f, getLocalBounds().height / 2.f);
   setRotation(angle);
   setPosition(startingPosition);
+
+  sf::Transform rotationTransform;
+  rotationTransform.rotate(angle);
+  velocity = rotationTransform.transformPoint(sf::Vector2f(0, -1)) * speed;
 }
 
-void Projectile::update(float deltaTime) {
+void Projectile::update(const float& deltaTime) {
   move(velocity * deltaTime);
 
   if (flashTimer.getElapsedTime().asSeconds() >= 0.01f) {
@@ -41,6 +43,13 @@ bool Projectile::isMarkedMarkedForDeletion() const {
 
 void Projectile::markForDeletion() {
   markedForDeletion = true;
+}
+
+void Projectile::rotate(const float& angle) {
+  sf::Transform transform;
+  transform.rotate(angle);
+  velocity = transform.transformPoint(velocity);
+  sf::Sprite::rotate(angle);
 }
 
 void Projectile::flash() {
