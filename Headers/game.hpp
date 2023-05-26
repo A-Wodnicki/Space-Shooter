@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include "background.hpp"
+#include "bonus.hpp"
 #include "projectile.hpp"
 
 class Game {
@@ -15,7 +16,8 @@ class Game {
 
  private:
   void loadTexture(const std::string& textureName, const std::string& fileName);
-  void updateProjectiles(const sf::Time& elapsed);
+  void updateProjectiles(const float& deltaTime);
+  void updateBonuses(const float& deltaTime);
 
   sf::RenderWindow window;
   std::unordered_map<std::string, std::unique_ptr<sf::Texture>> textures;
@@ -23,6 +25,7 @@ class Game {
   std::string textureFileExtension;
   std::unique_ptr<Background> background;
   std::vector<std::unique_ptr<Projectile>> projectiles;
+  std::vector<std::unique_ptr<Bonus>> bonuses;
   sf::Clock clock;
 };
 

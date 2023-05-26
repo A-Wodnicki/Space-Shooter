@@ -9,9 +9,10 @@ Projectile::Projectile(const sf::Texture& texture,
     : damage(damage),
       playerProjectile(isPlayer),
       markedForDeletion(false),
+      flashTimer(0),
       bright(false) {
   setTexture(texture);
-  setOrigin(getLocalBounds().width / 2.f, getLocalBounds().height / 2.f);
+  setOrigin(getLocalBounds().width / 2, getLocalBounds().height / 2);
   setRotation(angle);
   setPosition(startingPosition);
 
@@ -22,10 +23,11 @@ Projectile::Projectile(const sf::Texture& texture,
 
 void Projectile::update(const float& deltaTime) {
   move(velocity * deltaTime);
+  flashTimer += deltaTime;
 
-  if (flashTimer.getElapsedTime().asSeconds() >= 0.01f) {
+  if (flashTimer >= 0.01) {
     flash();
-    flashTimer.restart();
+    flashTimer = 0;
   }
 }
 

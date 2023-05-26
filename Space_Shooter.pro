@@ -5,9 +5,9 @@ CONFIG -= qt
 
 SOURCES += \
     Sources/background.cpp \
+    Sources/bonus.cpp \
     Sources/game.cpp \
     Sources/main.cpp \
-    Sources/playership.cpp \
     Sources/projectile.cpp
 
 INCLUDEPATH += \
@@ -23,6 +23,7 @@ CONFIG(debug, debug|release){
 }
 
 DISTFILES += \
+    Assets/Images/bonus.png \
     Assets/Images/laserBlue01.png \
     README.md \
     Assets/Images/blue.png \
@@ -30,8 +31,8 @@ DISTFILES += \
 
 HEADERS += \
     Headers/background.hpp \
+    Headers/bonus.hpp \
     Headers/game.hpp \
-    Headers/playership.hpp \
     Headers/projectile.hpp
 
 

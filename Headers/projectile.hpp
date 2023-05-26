@@ -26,7 +26,7 @@ class Projectile : public sf::Sprite {
   int damage;
   bool playerProjectile;
   bool markedForDeletion;
-  sf::Clock flashTimer;
+  float flashTimer;
   bool bright;
 };
 #endif  // PROJECTILE_HPP

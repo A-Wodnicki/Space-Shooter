@@ -1,15 +1,16 @@
 #include "game.hpp"
-#include <iostream>
-#include "projectile.hpp"
 
 Game::Game()
-    : window(sf::VideoMode::getDesktopMode(), "Space Shooter", sf::Style::None),
+    : window(sf::VideoMode::getDesktopMode(),
+             "Space Shooter",
+             sf::Style::Close),
       texturesDirectory("assets/images/"),
       textureFileExtension(".png") {
   ::ShowWindow(window.getSystemHandle(), SW_MAXIMIZE);
   window.setFramerateLimit(144);
 
   loadTexture("background", "blue");
+  loadTexture("bonus", "bonus");
   loadTexture("projectile", "laserBlue01");
 
   for (auto& [key, value] : textures) {
@@ -22,7 +23,7 @@ Game::Game()
 
 void Game::loop() {
   while (window.isOpen()) {
-    sf::Time elapsed = clock.restart();
+    float deltaTime = clock.restart().asSeconds();
 
     sf::Event event;
 
@@ -33,9 +34,10 @@ void Game::loop() {
 
     window.clear();
 
-    background->update(elapsed, window);
+    background->update(deltaTime, window);
 
-    updateProjectiles(elapsed);
+    updateProjectiles(deltaTime);
+    updateBonuses(deltaTime);
 
     window.display();
   }
@@ -50,7 +52,7 @@ void Game::loadTexture(const std::string& textureName,
   textures[textureName] = std::move(texture);
 }
 
-void Game::updateProjectiles(const sf::Time& elapsed) {
+void Game::updateProjectiles(const float& deltaTime) {
   projectiles.erase(
       std::remove_if(projectiles.begin(), projectiles.end(),
                      [](const std::unique_ptr<Projectile>& projectile) {
@@ -59,12 +61,29 @@ void Game::updateProjectiles(const sf::Time& elapsed) {
       projectiles.end());
   projectiles.shrink_to_fit();
   for (auto& projectile : projectiles) {
-    sf::Vector2f projectilePosition = projectile->getPosition();
-    if (projectilePosition.x < 0 || projectilePosition.y < 0 ||
-        projectilePosition.x > window.getSize().x ||
-        projectilePosition.y > window.getSize().y)
+    sf::FloatRect projectileBounds = projectile->getGlobalBounds();
+    if (projectileBounds.top < -projectileBounds.height ||
+        projectileBounds.left < -projectileBounds.width ||
+        projectileBounds.left - projectileBounds.width > window.getSize().x ||
+        projectileBounds.top - projectileBounds.height > window.getSize().y)
       projectile->markForDeletion();
-    projectile->update(elapsed.asSeconds());
+    projectile->update(deltaTime);
     window.draw(*projectile);
+  }
+}
+
+void Game::updateBonuses(const float& deltaTime) {
+  bonuses.erase(std::remove_if(bonuses.begin(), bonuses.end(),
+                               [](const std::unique_ptr<Bonus>& bonus) {
+                                 return bonus->isMarkedForDeletion();
+                               }),
+                bonuses.end());
+  bonuses.shrink_to_fit();
+  for (auto& bonus : bonuses) {
+    sf::FloatRect bonusBounds = bonus->getGlobalBounds();
+    if (bonusBounds.top - bonusBounds.height > window.getSize().y)
+      bonus->markForDeletion();
+    bonus->update(deltaTime);
+    window.draw(*bonus);
   }
 }

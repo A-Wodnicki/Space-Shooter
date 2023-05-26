@@ -18,8 +18,8 @@ Background::Background(const sf::Vector2u& windowSize, sf::Texture& texture)
       0, -backgroundSprites.back()->getLocalBounds().height);
 }
 
-void Background::update(const sf::Time& elapsed, sf::RenderWindow& window) {
-  scroll(elapsed);
+void Background::update(const float& deltaTime, sf::RenderWindow& window) {
+  scroll(deltaTime);
   draw(window);
 }
 
@@ -27,13 +27,13 @@ void Background::setScrollSpeed(const float& speed) {
   scrollSpeed = speed;
 }
 
-void Background::scroll(const sf::Time& elapsed) {
+void Background::scroll(const float& deltaTime) {
   for (const auto& background_sprite : backgroundSprites) {
     if (background_sprite->getPosition().y > windowSize.y) {
       background_sprite->setPosition(
           0, -background_sprite->getLocalBounds().height);
     }
-    background_sprite->move(0, scrollSpeed * elapsed.asSeconds());
+    background_sprite->move(0, scrollSpeed * deltaTime);
   }
 }
 

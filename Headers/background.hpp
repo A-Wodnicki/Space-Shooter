@@ -5,13 +5,13 @@
 
 class Background {
  public:
-  Background(const sf::Vector2u& windowSize, sf::Texture &texture);
+  Background(const sf::Vector2u& windowSize, sf::Texture& texture);
 
-  void update(const sf::Time& elapsed, sf::RenderWindow& window);
+  void update(const float& deltaTime, sf::RenderWindow& window);
   void setScrollSpeed(const float& speed);
 
  private:
-  void scroll(const sf::Time& elapsed);
+  void scroll(const float& deltaTime);
   void draw(sf::RenderWindow& window);
 
   std::vector<std::unique_ptr<sf::Sprite>> backgroundSprites;
