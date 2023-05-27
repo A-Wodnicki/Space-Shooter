@@ -1,14 +1,11 @@
 #include "background.hpp"
 
 Background::Background(const sf::Vector2u& windowSize, sf::Texture& texture)
-    : windowSize(windowSize), scrollSpeed(300) {
+    : backgroundSprites(2), windowSize(windowSize), scrollSpeed(300) {
   texture.setRepeated(true);
 
-  backgroundSprites.emplace_back(std::make_unique<sf::Sprite>());
-  backgroundSprites.emplace_back(std::make_unique<sf::Sprite>());
-
   for (auto& background_sprite : backgroundSprites) {
-    background_sprite->setTexture(texture);
+    background_sprite = std::make_unique<sf::Sprite>(texture);
     background_sprite->setTextureRect({0, 0,
                                        static_cast<int>(this->windowSize.x),
                                        static_cast<int>(this->windowSize.y)});

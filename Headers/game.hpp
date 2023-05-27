@@ -7,6 +7,7 @@
 #include "background.hpp"
 #include "bonus.hpp"
 #include "projectile.hpp"
+#include "ship.hpp"
 
 class Game {
  public:

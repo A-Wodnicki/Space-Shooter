@@ -8,7 +8,8 @@ SOURCES += \
     Sources/bonus.cpp \
     Sources/game.cpp \
     Sources/main.cpp \
-    Sources/projectile.cpp
+    Sources/projectile.cpp \
+    Sources/ship.cpp
 
 INCLUDEPATH += \
     "D:/SFML-2.5.1/include" \
@@ -24,7 +25,9 @@ CONFIG(debug, debug|release){
 
 DISTFILES += \
     Assets/Images/bonus.png \
+    Assets/Images/explosion.png \
     Assets/Images/laserBlue01.png \
+    Assets/Images/player.png \
     README.md \
     Assets/Images/blue.png \
     Assets/Images/ship.png
@@ -33,6 +36,7 @@ HEADERS += \
     Headers/background.hpp \
     Headers/bonus.hpp \
     Headers/game.hpp \
-    Headers/projectile.hpp
+    Headers/projectile.hpp \
+    Headers/ship.hpp
 
 

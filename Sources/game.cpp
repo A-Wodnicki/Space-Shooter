@@ -12,6 +12,8 @@ Game::Game()
   loadTexture("background", "blue");
   loadTexture("bonus", "bonus");
   loadTexture("projectile", "laserBlue01");
+  loadTexture("player", "player");
+  loadTexture("explosion", "explosion");
 
   for (auto& [key, value] : textures) {
     value->setSmooth(true);
@@ -36,8 +38,9 @@ void Game::loop() {
 
     background->update(deltaTime, window);
 
-    updateProjectiles(deltaTime);
     updateBonuses(deltaTime);
+
+    updateProjectiles(deltaTime);
 
     window.display();
   }

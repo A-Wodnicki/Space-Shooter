@@ -6,12 +6,12 @@ Projectile::Projectile(const sf::Texture& texture,
                        const int& damage,
                        const bool& isPlayer,
                        const sf::Vector2f& startingPosition)
-    : damage(damage),
+    : sf::Sprite(texture),
+      damage(damage),
       playerProjectile(isPlayer),
       markedForDeletion(false),
       flashTimer(0),
       bright(false) {
-  setTexture(texture);
   setOrigin(getLocalBounds().width / 2, getLocalBounds().height / 2);
   setRotation(angle);
   setPosition(startingPosition);

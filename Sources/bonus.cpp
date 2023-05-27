@@ -3,8 +3,10 @@
 Bonus::Bonus(const sf::Texture& texture,
              const bool& isPowerUp,
              const sf::Vector2f& startingPosition)
-    : isPowerUp(isPowerUp), velocity(0, 100), markedForDeletion(false) {
-  setTexture(texture);
+    : sf::Sprite(texture),
+      isPowerUp(isPowerUp),
+      velocity(0, 100),
+      markedForDeletion(false) {
   if (this->isPowerUp)
     setTextureRect(
         sf::IntRect(0, 0, texture.getSize().x / 2, texture.getSize().y));
