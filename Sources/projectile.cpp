@@ -3,11 +3,9 @@
 Projectile::Projectile(const sf::Texture& texture,
                        const float& speed,
                        const float& angle,
-                       const int& damage,
                        const bool& isPlayer,
                        const sf::Vector2f& startingPosition)
     : sf::Sprite(texture),
-      damage(damage),
       playerProjectile(isPlayer),
       markedForDeletion(false),
       flashTimer(0),
@@ -29,10 +27,6 @@ void Projectile::update(const float& deltaTime) {
     flash();
     flashTimer = 0;
   }
-}
-
-int Projectile::getDamage() const {
-  return damage;
 }
 
 bool Projectile::isPlayerOwned() const {

@@ -11,11 +11,16 @@ Player::Player(const sf::Texture& texture,
            windowSize,
            300,
            projectiles),
-      projectile(projectile) {}
+      projectile(projectile),
+      hp(3) {}
 
 void Player::update(const float& deltaTime) {
   handleControl(deltaTime);
   Ship::update(deltaTime);
+}
+
+int Player::getHp() const {
+  return hp;
 }
 
 void Player::handleControl(const float& deltaTime) {
@@ -48,12 +53,26 @@ void Player::handleControl(const float& deltaTime) {
     changeAnimationType();
   }
 
-  if (sf::Keyboard::isKeyPressed(shootButton) &&
-      projectileCooldown.getElapsedTime().asSeconds() >= .1) {
-    projectileCooldown.restart();
-    for (int i = 0; i < 4; ++i)
-      projectiles.emplace_back(std::make_unique<Projectile>(
-          projectile, 500, 345 + i * 10, 1, true,
-          sf::Vector2f(getPosition().x, getGlobalBounds().top)));
+  if (sf::Keyboard::isKeyPressed(shootButton1) &&
+      projectileCooldown.getElapsedTime().asSeconds() >= 0.075) {
+    shoot(0);
   }
+
+  if (sf::Keyboard::isKeyPressed(shootButton2) &&
+      projectileCooldown.getElapsedTime().asSeconds() >= 0.075) {
+    shoot(20);
+  }
+
+  if (projectileCooldown.getElapsedTime().asSeconds() >= 0.075)
+    projectileCooldown.restart();
+}
+
+void Player::shoot(int angle) {
+  for (int i = 0; i < 4; ++i)
+    projectiles.emplace_back(std::make_unique<Projectile>(
+        projectile, 1000,
+        !angle ? 0 : 360 - angle % 90 + 2 * i * (360 - (360 - angle % 90)) / 3,
+        true,
+        sf::Vector2f(getGlobalBounds().left + getGlobalBounds().width / 3 * i,
+                     getGlobalBounds().top)));
 }

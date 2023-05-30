@@ -8,7 +8,6 @@ class Projectile : public sf::Sprite {
   Projectile(const sf::Texture& texture,
              const float& speed,
              const float& angle,
-             const int& damage,
              const bool& isPlayer,
              const sf::Vector2f& startingPosition);
 
@@ -23,7 +22,6 @@ class Projectile : public sf::Sprite {
   void flash();
 
   sf::Vector2f velocity;
-  int damage;
   bool playerProjectile;
   bool markedForDeletion;
   float flashTimer;

@@ -11,12 +11,19 @@ class Player : public Ship {
          std::vector<std::unique_ptr<Projectile>>& projectiles);
 
   void update(const float& deltaTime);
+  int getHp() const;
 
  private:
   void handleControl(const float& deltaTime);
-  sf::Keyboard::Key shootButton = sf::Keyboard::Key::Space;
+  void shoot(int angle);
+  void shootNarrow();
+  void shootWide();
+
+  sf::Keyboard::Key shootButton1 = sf::Keyboard::Key::J;
+  sf::Keyboard::Key shootButton2 = sf::Keyboard::Key::K;
   const sf::Texture& projectile;
   sf::Clock projectileCooldown;
+  int hp;
 };
 
 #endif  // PLAYER_HPP
