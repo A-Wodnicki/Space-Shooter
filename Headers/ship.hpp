@@ -2,6 +2,7 @@
 #define SHIP_HPP
 
 #include <SFML/Graphics.hpp>
+#include "projectile.hpp"
 
 enum class AppearDirection { Top, Right, Bottom, Left };
 
@@ -11,21 +12,23 @@ class Ship : public sf::Sprite {
        const sf::Vector2f& position,
        const AppearDirection& appearDirection,
        const sf::Vector2u& windowSize,
-       const float& speed);
+       const float& speed,
+       std::vector<std::unique_ptr<Projectile> > &projectiles);
 
   virtual ~Ship() = default;
 
   void update(const float& deltaTime);
 
-  void moveUp(const float& deltaTime);
-  void moveRight(const float& deltaTime);
-  void moveDown(const float& deltaTime);
-  void moveLeft(const float& deltaTime);
-
  protected:
   void animate();
   void appear(const float& deltaTime);
   void flipSpriteHorizontally();
+  void changeAnimationType();
+
+  void moveUp(const float& deltaTime);
+  void moveRight(const float& deltaTime);
+  void moveDown(const float& deltaTime);
+  void moveLeft(const float& deltaTime);
 
   sf::Vector2f targetPositon;
   AppearDirection appearDirection;
@@ -40,6 +43,8 @@ class Ship : public sf::Sprite {
   bool isFlippedHorizontally;
 
   float speed;
+
+  std::vector<std::unique_ptr<Projectile>>& projectiles;
 };
 
 #endif  // SHIP_HPP

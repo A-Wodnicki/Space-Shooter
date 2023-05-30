@@ -4,7 +4,8 @@ Ship::Ship(const sf::Texture& texture,
            const sf::Vector2f& position,
            const AppearDirection& appearDirection,
            const sf::Vector2u& windowSize,
-           const float& speed)
+           const float& speed,
+           std::vector<std::unique_ptr<Projectile> >& projectiles)
     : sf::Sprite(texture),
       targetPositon(position),
       appearDirection(appearDirection),
@@ -14,7 +15,8 @@ Ship::Ship(const sf::Texture& texture,
       idleAnimationFrames(2),
       turningAnimationFrames(2),
       isFlippedHorizontally(false),
-      speed(speed) {
+      speed(speed),
+      projectiles(projectiles) {
   for (size_t i = 0; i < idleAnimationFrames.size(); ++i) {
     idleAnimationFrames[i] =
         sf::IntRect(i * texture.getSize().x / frames, 0,
@@ -23,8 +25,6 @@ Ship::Ship(const sf::Texture& texture,
         sf::IntRect((i + 2) * texture.getSize().x / frames, 0,
                     texture.getSize().x / frames, texture.getSize().y);
   }
-
-  setOrigin(getGlobalBounds().width / 2, getGlobalBounds().height / 2);
 
   sf::Vector2f startingPosition;
   switch (this->appearDirection) {
@@ -50,6 +50,7 @@ Ship::Ship(const sf::Texture& texture,
     currentFrame = idleAnimationFrames.begin();
 
   setTextureRect(*currentFrame);
+  setOrigin(getGlobalBounds().width / 2, getGlobalBounds().height / 2);
 }
 
 void Ship::update(const float& deltaTime) {
@@ -57,26 +58,6 @@ void Ship::update(const float& deltaTime) {
     appear(deltaTime);
 
   animate();
-}
-
-void Ship::moveUp(const float& deltaTime) {
-  move(sf::Vector2f(0, -speed) * deltaTime);
-}
-
-void Ship::moveRight(const float& deltaTime) {
-  if (!isFlippedHorizontally)
-    flipSpriteHorizontally();
-  move(sf::Vector2f(speed, 0) * deltaTime);
-}
-
-void Ship::moveDown(const float& deltaTime) {
-  move(sf::Vector2f(0, speed) * deltaTime);
-}
-
-void Ship::moveLeft(const float& deltaTime) {
-  if (isFlippedHorizontally)
-    flipSpriteHorizontally();
-  move(sf::Vector2f(-speed, 0) * deltaTime);
 }
 
 void Ship::animate() {
@@ -124,4 +105,32 @@ void Ship::appear(const float& deltaTime) {
 void Ship::flipSpriteHorizontally() {
   setScale(-getScale().x, getScale().y);
   isFlippedHorizontally = !isFlippedHorizontally;
+}
+
+void Ship::changeAnimationType() {
+  if (isTurning) {
+    currentFrame = turningAnimationFrames.begin();
+    return;
+  }
+  currentFrame = idleAnimationFrames.begin();
+}
+
+void Ship::moveUp(const float& deltaTime) {
+  move(sf::Vector2f(0, -speed) * deltaTime);
+}
+
+void Ship::moveRight(const float& deltaTime) {
+  if (!isFlippedHorizontally)
+    flipSpriteHorizontally();
+  move(sf::Vector2f(speed, 0) * deltaTime);
+}
+
+void Ship::moveDown(const float& deltaTime) {
+  move(sf::Vector2f(0, speed) * deltaTime);
+}
+
+void Ship::moveLeft(const float& deltaTime) {
+  if (isFlippedHorizontally)
+    flipSpriteHorizontally();
+  move(sf::Vector2f(-speed, 0) * deltaTime);
 }

@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include "player.hpp"
 
 Game::Game()
     : window(sf::VideoMode::getDesktopMode(),
@@ -8,6 +9,7 @@ Game::Game()
       textureFileExtension(".png") {
   ::ShowWindow(window.getSystemHandle(), SW_MAXIMIZE);
   window.setFramerateLimit(144);
+  window.setKeyRepeatEnabled(false);
 
   loadTexture("background", "blue");
   loadTexture("bonus", "bonus");
@@ -24,6 +26,9 @@ Game::Game()
 }
 
 void Game::loop() {
+  auto player =
+      std::make_unique<Player>(*textures["player"], *textures["projectile"],
+                               window.getSize(), projectiles);
   while (window.isOpen()) {
     float deltaTime = clock.restart().asSeconds();
 
@@ -39,6 +44,9 @@ void Game::loop() {
     background->update(deltaTime, window);
 
     updateBonuses(deltaTime);
+
+    player->update(deltaTime);
+    window.draw(*player);
 
     updateProjectiles(deltaTime);
 

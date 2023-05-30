@@ -8,6 +8,7 @@ SOURCES += \
     Sources/bonus.cpp \
     Sources/game.cpp \
     Sources/main.cpp \
+    Sources/player.cpp \
     Sources/projectile.cpp \
     Sources/ship.cpp
 
@@ -36,6 +37,7 @@ HEADERS += \
     Headers/background.hpp \
     Headers/bonus.hpp \
     Headers/game.hpp \
+    Headers/player.hpp \
     Headers/projectile.hpp \
     Headers/ship.hpp
 
