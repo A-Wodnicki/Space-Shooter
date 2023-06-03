@@ -6,6 +6,7 @@
 #include <SFML/Window.hpp>
 #include "background.hpp"
 #include "bonus.hpp"
+#include "enemy.hpp"
 #include "player.hpp"
 #include "projectile.hpp"
 
@@ -17,8 +18,10 @@ class Game {
 
  private:
   void loadTexture(const std::string& textureName, const std::string& fileName);
-  void updateProjectiles(const float& deltaTime);
+  void updateEnemies(const float& deltaTime);
   void updateBonuses(const float& deltaTime);
+  void updateProjectiles(const float& deltaTime);
+  void updateUi();
 
   sf::RenderWindow window;
   sf::Clock clock;
@@ -31,8 +34,11 @@ class Game {
 
   std::vector<std::unique_ptr<Projectile>> projectiles;
   std::vector<std::unique_ptr<Bonus>> bonuses;
+  std::vector<std::unique_ptr<Enemy>> enemies;
 
   std::unique_ptr<Player> player;
+
+  int scoreValue;
 
   sf::Font font;
   sf::Text playerHp;

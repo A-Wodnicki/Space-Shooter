@@ -24,7 +24,7 @@ class Projectile : public sf::Sprite {
   sf::Vector2f velocity;
   bool playerProjectile;
   bool markedForDeletion;
-  float flashTimer;
+  sf::Clock flashTimer;
   bool bright;
 };
 #endif  // PROJECTILE_HPP

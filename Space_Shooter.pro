@@ -6,6 +6,7 @@ CONFIG -= qt
 SOURCES += \
     Sources/background.cpp \
     Sources/bonus.cpp \
+    Sources/enemy.cpp \
     Sources/game.cpp \
     Sources/main.cpp \
     Sources/player.cpp \
@@ -37,6 +38,7 @@ DISTFILES += \
 HEADERS += \
     Headers/background.hpp \
     Headers/bonus.hpp \
+    Headers/enemy.hpp \
     Headers/game.hpp \
     Headers/player.hpp \
     Headers/projectile.hpp \

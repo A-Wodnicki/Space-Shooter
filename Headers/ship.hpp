@@ -13,7 +13,8 @@ class Ship : public sf::Sprite {
        const AppearDirection& appearDirection,
        const sf::Vector2u& windowSize,
        const float& speed,
-       std::vector<std::unique_ptr<Projectile> > &projectiles);
+       const sf::Texture& projectile,
+       std::vector<std::unique_ptr<Projectile>>& projectiles);
 
   virtual ~Ship() = default;
 
@@ -44,6 +45,7 @@ class Ship : public sf::Sprite {
 
   float speed;
 
+  const sf::Texture& projectile;
   std::vector<std::unique_ptr<Projectile>>& projectiles;
 };
 

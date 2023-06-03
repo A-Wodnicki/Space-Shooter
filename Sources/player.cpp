@@ -10,10 +10,11 @@ Player::Player(const sf::Texture& texture,
            AppearDirection::Bottom,
            windowSize,
            300,
+           projectile,
            projectiles),
-      projectile(projectile),
       projectileAngle(10),
       hp(3),
+      scoreMultiplier(100),
       powerUpCount(3),
       superOnCooldown(true),
       shootingSuper(false) {}
@@ -36,20 +37,24 @@ int Player::getHp() const {
   return hp;
 }
 
-int Player::getPowerUpCount() const {
-  return powerUpCount;
-}
-
-bool Player::isSuperOnCooldown() const {
-  return superOnCooldown;
-}
-
 void Player::setHp(const int& hp) {
   this->hp = hp;
 }
 
+int Player::getScoreMultiplier() const {
+  return scoreMultiplier;
+}
+
+int Player::getPowerUpCount() const {
+  return powerUpCount;
+}
+
 void Player::addPowerUp() {
   powerUpCount++;
+}
+
+bool Player::isSuperOnCooldown() const {
+  return superOnCooldown;
 }
 
 void Player::handleControl(const float& deltaTime) {
@@ -84,17 +89,18 @@ void Player::handleControl(const float& deltaTime) {
 
   if (sf::Keyboard::isKeyPressed(shootButton3) && powerUpCount &&
       !shootingSuper && !superOnCooldown) {
+    scoreMultiplier = 25;
     shootingSuper = true;
     superDuration.restart();
   }
 
   if (sf::Keyboard::isKeyPressed(shootButton1) &&
       projectileCooldown.getElapsedTime().asSeconds() >= 0.075) {
+    scoreMultiplier = 100;
     shoot(0);
-  }
-
-  if (sf::Keyboard::isKeyPressed(shootButton2) &&
-      projectileCooldown.getElapsedTime().asSeconds() >= 0.075) {
+  } else if (sf::Keyboard::isKeyPressed(shootButton2) &&
+             projectileCooldown.getElapsedTime().asSeconds() >= 0.075) {
+    scoreMultiplier = 50;
     shoot(projectileAngle);
     projectileAngle += 2;
     if (projectileAngle >= 40)

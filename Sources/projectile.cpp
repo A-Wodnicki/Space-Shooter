@@ -8,7 +8,6 @@ Projectile::Projectile(const sf::Texture& texture,
     : sf::Sprite(texture),
       playerProjectile(isPlayer),
       markedForDeletion(false),
-      flashTimer(0),
       bright(false) {
   setOrigin(getLocalBounds().width / 2, getLocalBounds().height / 2);
   setRotation(angle);
@@ -21,11 +20,10 @@ Projectile::Projectile(const sf::Texture& texture,
 
 void Projectile::update(const float& deltaTime, sf::RenderWindow& window) {
   move(velocity * deltaTime);
-  flashTimer += deltaTime;
 
-  if (flashTimer >= 0.01) {
+  if (flashTimer.getElapsedTime().asSeconds() >= 0.01) {
     flash();
-    flashTimer = 0;
+    flashTimer.restart();
   }
 
   window.draw(*this);

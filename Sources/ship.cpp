@@ -5,6 +5,7 @@ Ship::Ship(const sf::Texture& texture,
            const AppearDirection& appearDirection,
            const sf::Vector2u& windowSize,
            const float& speed,
+           const sf::Texture& projectile,
            std::vector<std::unique_ptr<Projectile> >& projectiles)
     : sf::Sprite(texture),
       targetPositon(position),
@@ -16,6 +17,7 @@ Ship::Ship(const sf::Texture& texture,
       turningAnimationFrames(2),
       isFlippedHorizontally(false),
       speed(speed),
+      projectile(projectile),
       projectiles(projectiles) {
   for (size_t i = 0; i < idleAnimationFrames.size(); ++i) {
     idleAnimationFrames[i] =

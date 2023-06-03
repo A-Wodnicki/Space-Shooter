@@ -6,10 +6,10 @@ Game::Game()
              sf::Style::Fullscreen),
       texturesDirectory("assets/images/"),
       textureFileExtension(".png"),
+      scoreValue(0),
       playerHp("", font),
       playerPowerUpCount("", font),
-      score("score: 0", font),
-      numbersBox() {
+      score("", font) {
   ::ShowWindow(window.getSystemHandle(), SW_MAXIMIZE);
   window.setFramerateLimit(144);
 
@@ -18,6 +18,7 @@ Game::Game()
   loadTexture("projectile", "laserBlue01");
   loadTexture("player", "player");
   loadTexture("explosion", "explosion");
+  loadTexture("enemy", "enemy1");
 
   for (auto& [key, value] : textures) {
     value->setSmooth(true);
@@ -48,6 +49,9 @@ Game::Game()
 }
 
 void Game::loop() {
+  enemies.emplace_back(std::make_unique<Enemy>(
+      *textures["enemy"], sf::Vector2f(300.f, 300.f), AppearDirection::Right,
+      20, window.getSize(), *textures["projectile"], projectiles));
   while (window.isOpen()) {
     float deltaTime = clock.restart().asSeconds();
 
@@ -58,25 +62,11 @@ void Game::loop() {
         window.close();
     }
 
-    playerHp.setString("hp: " + std::to_string(player->getHp()));
-    playerPowerUpCount.setString("special: " +
-                                 std::to_string(player->getPowerUpCount()));
-
-    numbersBox.setSize(
-        sf::Vector2f(std::max({score.getGlobalBounds().width,
-                               playerHp.getGlobalBounds().width,
-                               playerPowerUpCount.getGlobalBounds().width}) +
-                         2 * score.getCharacterSize(),
-                     numbersBox.getSize().y));
-
-    if (player->isSuperOnCooldown())
-      playerPowerUpCount.setFillColor(sf::Color(255, 255, 255, 100));
-    else
-      playerPowerUpCount.setFillColor(sf::Color(255, 255, 255, 255));
-
     window.clear();
 
     background->update(deltaTime, window);
+
+    updateEnemies(deltaTime);
 
     updateBonuses(deltaTime);
 
@@ -84,10 +74,7 @@ void Game::loop() {
 
     updateProjectiles(deltaTime);
 
-    window.draw(numbersBox);
-    window.draw(playerHp);
-    window.draw(playerPowerUpCount);
-    window.draw(score);
+    updateUi();
 
     window.display();
   }
@@ -100,6 +87,51 @@ void Game::loadTexture(const std::string& textureName,
                              textureFileExtension))
     window.close();
   textures[textureName] = std::move(texture);
+}
+
+void Game::updateEnemies(const float& deltaTime) {
+  enemies.erase(std::remove_if(enemies.begin(), enemies.end(),
+                               [](const std::unique_ptr<Enemy>& enemy) {
+                                 return enemy->isMarkedForDeletion();
+                               }),
+                enemies.end());
+
+  enemies.shrink_to_fit();
+
+  for (auto& enemy : enemies) {
+    if (!enemy->getHp()) {
+      enemy->markForDeletion();
+      scoreValue += 1 * player->getScoreMultiplier();
+    }
+
+    enemy->update(deltaTime, window);
+  }
+}
+
+void Game::updateBonuses(const float& deltaTime) {
+  bonuses.erase(std::remove_if(bonuses.begin(), bonuses.end(),
+                               [](const std::unique_ptr<Bonus>& bonus) {
+                                 return bonus->isMarkedForDeletion();
+                               }),
+                bonuses.end());
+
+  bonuses.shrink_to_fit();
+
+  sf::FloatRect playerBounds = player->getGlobalBounds();
+
+  for (auto& bonus : bonuses) {
+    sf::FloatRect bonusBounds = bonus->getGlobalBounds();
+
+    if (bonusBounds.intersects(playerBounds))
+      bonus->isPowerUp() ? player->addPowerUp()
+                         : player->setHp(player->getHp() + 1);
+
+    if (bonusBounds.intersects(playerBounds) ||
+        bonusBounds.top - bonusBounds.height > window.getSize().y)
+      bonus->markForDeletion();
+
+    bonus->update(deltaTime, window);
+  }
 }
 
 void Game::updateProjectiles(const float& deltaTime) {
@@ -129,32 +161,38 @@ void Game::updateProjectiles(const float& deltaTime) {
       player->setHp(player->getHp() - 1);
     }
 
+    if (projectile->isPlayerOwned())
+      for (auto& enemy : enemies) {
+        sf::FloatRect enemyBounds = enemy->getGlobalBounds();
+        if (enemyBounds.intersects(projectileBounds)) {
+          projectile->markForDeletion();
+          enemy->setHp(enemy->getHp() - 1);
+        }
+      }
+
     projectile->update(deltaTime, window);
   }
 }
 
-void Game::updateBonuses(const float& deltaTime) {
-  bonuses.erase(std::remove_if(bonuses.begin(), bonuses.end(),
-                               [](const std::unique_ptr<Bonus>& bonus) {
-                                 return bonus->isMarkedForDeletion();
-                               }),
-                bonuses.end());
+void Game::updateUi() {
+  score.setString("score: " + std::to_string(scoreValue));
+  playerHp.setString("hp: " + std::to_string(player->getHp()));
+  playerPowerUpCount.setString("special: " +
+                               std::to_string(player->getPowerUpCount()));
 
-  bonuses.shrink_to_fit();
+  numbersBox.setSize(sf::Vector2f(
+      std::max({score.getGlobalBounds().width, playerHp.getGlobalBounds().width,
+                playerPowerUpCount.getGlobalBounds().width}) +
+          2 * score.getCharacterSize(),
+      numbersBox.getSize().y));
 
-  sf::FloatRect playerBounds = player->getGlobalBounds();
+  if (player->isSuperOnCooldown())
+    playerPowerUpCount.setFillColor(sf::Color(255, 255, 255, 100));
+  else
+    playerPowerUpCount.setFillColor(sf::Color(255, 255, 255, 255));
 
-  for (auto& bonus : bonuses) {
-    sf::FloatRect bonusBounds = bonus->getGlobalBounds();
-
-    if (bonusBounds.intersects(playerBounds))
-      bonus->isPowerUp() ? player->addPowerUp()
-                         : player->setHp(player->getHp() + 1);
-
-    if (bonusBounds.intersects(playerBounds) ||
-        bonusBounds.top - bonusBounds.height > window.getSize().y)
-      bonus->markForDeletion();
-
-    bonus->update(deltaTime, window);
-  }
+  window.draw(numbersBox);
+  window.draw(score);
+  window.draw(playerHp);
+  window.draw(playerPowerUpCount);
 }

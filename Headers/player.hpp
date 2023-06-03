@@ -12,11 +12,14 @@ class Player : public Ship {
 
   void update(const float& deltaTime, sf::RenderWindow& window);
   int getHp() const;
-  int getPowerUpCount() const;
-  bool isSuperOnCooldown() const;
-
   void setHp(const int& hp);
+
+  int getScoreMultiplier() const;
+
+  int getPowerUpCount() const;
   void addPowerUp();
+
+  bool isSuperOnCooldown() const;
 
  private:
   void handleControl(const float& deltaTime);
@@ -30,10 +33,13 @@ class Player : public Ship {
                     shootButton1 = sf::Keyboard::Key::J,
                     shootButton2 = sf::Keyboard::Key::K,
                     shootButton3 = sf::Keyboard::Key::L;
-  const sf::Texture& projectile;
+
   sf::Clock projectileCooldown;
   int projectileAngle;
+
   int hp;
+  int scoreMultiplier;
+
   int powerUpCount;
   sf::Clock superDuration;
   sf::Clock superCooldown;
