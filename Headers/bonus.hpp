@@ -5,14 +5,15 @@
 class Bonus : public sf::Sprite {
  public:
   Bonus(const sf::Texture& texture,
-        const bool& isPowerUp,
+        const bool& powerUp,
         const sf::Vector2f& startingPosition);
-  void update(const float& deltaTime);
+  void update(const float& deltaTime, sf::RenderWindow& window);
   bool isMarkedForDeletion();
   void markForDeletion();
+  bool isPowerUp() const;
 
  private:
-  bool isPowerUp;
+  bool powerUp;
   sf::Vector2f velocity;
   bool markedForDeletion;
 };

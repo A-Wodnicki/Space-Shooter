@@ -1,13 +1,13 @@
 #include "bonus.hpp"
 
 Bonus::Bonus(const sf::Texture& texture,
-             const bool& isPowerUp,
+             const bool& powerUp,
              const sf::Vector2f& startingPosition)
     : sf::Sprite(texture),
-      isPowerUp(isPowerUp),
+      powerUp(powerUp),
       velocity(0, 100),
       markedForDeletion(false) {
-  if (this->isPowerUp)
+  if (this->powerUp)
     setTextureRect(
         sf::IntRect(0, 0, texture.getSize().x / 2, texture.getSize().y));
   else
@@ -17,8 +17,9 @@ Bonus::Bonus(const sf::Texture& texture,
   setPosition(startingPosition);
 }
 
-void Bonus::update(const float& deltaTime) {
+void Bonus::update(const float& deltaTime, sf::RenderWindow& window) {
   move(velocity * deltaTime);
+  window.draw(*this);
 }
 
 bool Bonus::isMarkedForDeletion() {
@@ -27,4 +28,8 @@ bool Bonus::isMarkedForDeletion() {
 
 void Bonus::markForDeletion() {
   markedForDeletion = true;
+}
+
+bool Bonus::isPowerUp() const {
+  return powerUp;
 }

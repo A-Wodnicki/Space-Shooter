@@ -11,7 +11,7 @@ class Projectile : public sf::Sprite {
              const bool& isPlayer,
              const sf::Vector2f& startingPosition);
 
-  void update(const float& deltaTime);
+  void update(const float& deltaTime, sf::RenderWindow& window);
   int getDamage() const;
   bool isPlayerOwned() const;
   bool isMarkedMarkedForDeletion() const;

@@ -19,7 +19,7 @@ Projectile::Projectile(const sf::Texture& texture,
   velocity = rotationTransform.transformPoint(sf::Vector2f(0, -1)) * speed;
 }
 
-void Projectile::update(const float& deltaTime) {
+void Projectile::update(const float& deltaTime, sf::RenderWindow& window) {
   move(velocity * deltaTime);
   flashTimer += deltaTime;
 
@@ -27,6 +27,8 @@ void Projectile::update(const float& deltaTime) {
     flash();
     flashTimer = 0;
   }
+
+  window.draw(*this);
 }
 
 bool Projectile::isPlayerOwned() const {

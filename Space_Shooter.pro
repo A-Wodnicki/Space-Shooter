@@ -29,6 +29,7 @@ DISTFILES += \
     Assets/Images/explosion.png \
     Assets/Images/laserBlue01.png \
     Assets/Images/player.png \
+    Assets/fonts/kenvector_future.ttf \
     README.md \
     Assets/Images/blue.png \
     Assets/Images/ship.png

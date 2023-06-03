@@ -12,17 +12,24 @@ Player::Player(const sf::Texture& texture,
            300,
            projectiles),
       projectile(projectile),
+      projectileAngle(10),
       hp(3),
       powerUpCount(3),
+      superOnCooldown(true),
       shootingSuper(false) {}
 
-void Player::update(const float& deltaTime) {
+void Player::update(const float& deltaTime, sf::RenderWindow& window) {
   Ship::update(deltaTime);
 
   if (shootingSuper)
     shootSuper();
 
+  if (superCooldown.getElapsedTime().asSeconds() >= 3)
+    superOnCooldown = false;
+
   handleControl(deltaTime);
+
+  window.draw(*this);
 }
 
 int Player::getHp() const {
@@ -33,8 +40,12 @@ int Player::getPowerUpCount() const {
   return powerUpCount;
 }
 
-void Player::addHp() {
-  hp++;
+bool Player::isSuperOnCooldown() const {
+  return superOnCooldown;
+}
+
+void Player::setHp(const int& hp) {
+  this->hp = hp;
 }
 
 void Player::addPowerUp() {
@@ -45,35 +56,34 @@ void Player::handleControl(const float& deltaTime) {
   if (isAppearing)
     return;
 
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W))
+  if (sf::Keyboard::isKeyPressed(moveUpButton))
     moveUp(deltaTime);
 
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D))
+  if (sf::Keyboard::isKeyPressed(moveRightButton))
     moveRight(deltaTime);
 
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S))
+  if (sf::Keyboard::isKeyPressed(moveDownButton))
     moveDown(deltaTime);
 
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A))
+  if (sf::Keyboard::isKeyPressed(moveLeftButton))
     moveLeft(deltaTime);
 
-  if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) ==
-       sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) &&
+  if ((sf::Keyboard::isKeyPressed(moveLeftButton) ==
+       sf::Keyboard::isKeyPressed(moveRightButton)) &&
       isTurning) {
     isTurning = false;
     changeAnimationType();
   }
 
-  if ((sf::Keyboard::isKeyPressed(sf::Keyboard::Key::A) !=
-       sf::Keyboard::isKeyPressed(sf::Keyboard::Key::D)) &&
+  if ((sf::Keyboard::isKeyPressed(moveLeftButton) !=
+       sf::Keyboard::isKeyPressed(moveRightButton)) &&
       !isTurning) {
     isTurning = true;
     changeAnimationType();
   }
 
-  if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::L) && powerUpCount &&
-      !shootingSuper && superCooldown.getElapsedTime().asSeconds() > 3) {
-    powerUpCount--;
+  if (sf::Keyboard::isKeyPressed(shootButton3) && powerUpCount &&
+      !shootingSuper && !superOnCooldown) {
     shootingSuper = true;
     superDuration.restart();
   }
@@ -113,6 +123,8 @@ void Player::shootSuper() {
   if (superDuration.getElapsedTime().asSeconds() >= 1) {
     shootingSuper = false;
     superCooldown.restart();
+    superOnCooldown = true;
+    powerUpCount--;
   }
 
   if (projectileCooldown.getElapsedTime().asSeconds() < 0.075)
