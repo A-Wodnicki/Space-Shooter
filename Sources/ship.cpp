@@ -8,7 +8,7 @@ Ship::Ship(const sf::Texture& texture,
            const sf::Texture& projectile,
            std::vector<std::unique_ptr<Projectile> >& projectiles)
     : sf::Sprite(texture),
-      targetPositon(position),
+      targetPosition(position),
       appearDirection(appearDirection),
       isAppearing(true),
       frames(4),
@@ -31,16 +31,16 @@ Ship::Ship(const sf::Texture& texture,
   sf::Vector2f startingPosition;
   switch (this->appearDirection) {
     case AppearDirection::Top:
-      startingPosition = {targetPositon.x, -getGlobalBounds().height};
+      startingPosition = {targetPosition.x, -getGlobalBounds().height};
       break;
     case AppearDirection::Right:
-      startingPosition = {static_cast<float>(windowSize.x), targetPositon.y};
+      startingPosition = {static_cast<float>(windowSize.x), targetPosition.y};
       break;
     case AppearDirection::Bottom:
-      startingPosition = {targetPositon.x, static_cast<float>(windowSize.y)};
+      startingPosition = {targetPosition.x, static_cast<float>(windowSize.y)};
       break;
     case AppearDirection::Left:
-      startingPosition = {-getGlobalBounds().width, targetPositon.y};
+      startingPosition = {-getGlobalBounds().width, targetPosition.y};
       break;
   }
   setPosition(startingPosition);
@@ -78,24 +78,24 @@ void Ship::animate() {
 void Ship::appear(const float& deltaTime) {
   switch (appearDirection) {
     case AppearDirection::Top:
-      if (targetPositon.y <= getPosition().y)
+      if (targetPosition.y <= getPosition().y)
         isAppearing = false;
       moveDown(deltaTime);
       break;
     case AppearDirection::Right:
-      if (targetPositon.x >= getPosition().x) {
+      if (targetPosition.x >= getPosition().x) {
         isAppearing = false;
         currentFrame = idleAnimationFrames.begin();
       }
       moveLeft(deltaTime);
       break;
     case AppearDirection::Bottom:
-      if (targetPositon.y >= getPosition().y)
+      if (targetPosition.y >= getPosition().y)
         isAppearing = false;
       moveUp(deltaTime);
       break;
     case AppearDirection::Left:
-      if (targetPositon.x <= getPosition().x) {
+      if (targetPosition.x <= getPosition().x) {
         isAppearing = false;
         currentFrame = idleAnimationFrames.begin();
       }

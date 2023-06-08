@@ -9,16 +9,22 @@ Game::Game()
       scoreValue(0),
       playerHp("", font),
       playerPowerUpCount("", font),
-      score("", font) {
+      score("", font),
+      gen(randomDevice()),
+      randomEnemy(0, 5),
+      randomEnemyPositionX(0, window.getSize().x),
+      randomEnemyPositionY(0, window.getSize().y / 2) {
   ::ShowWindow(window.getSystemHandle(), SW_MAXIMIZE);
   window.setFramerateLimit(144);
 
   loadTexture("background", "blue");
   loadTexture("bonus", "bonus");
   loadTexture("projectile", "laserBlue01");
+  loadTexture("enemyProjectile", "laserRed01");
   loadTexture("player", "player");
   loadTexture("explosion", "explosion");
-  loadTexture("enemy", "enemy1");
+  for (int i = 0; i < 6; ++i)
+    loadTexture("enemy" + std::to_string(i), "enemy" + std::to_string(i + 1));
 
   for (auto& [key, value] : textures) {
     value->setSmooth(true);
@@ -49,9 +55,6 @@ Game::Game()
 }
 
 void Game::loop() {
-  enemies.emplace_back(std::make_unique<Enemy>(
-      *textures["enemy"], sf::Vector2f(300.f, 300.f), AppearDirection::Right,
-      20, window.getSize(), *textures["projectile"], projectiles));
   while (window.isOpen()) {
     float deltaTime = clock.restart().asSeconds();
 
@@ -65,6 +68,8 @@ void Game::loop() {
     window.clear();
 
     background->update(deltaTime, window);
+
+    spawnEnemies();
 
     updateEnemies(deltaTime);
 
@@ -82,21 +87,24 @@ void Game::loop() {
 
 void Game::loadTexture(const std::string& textureName,
                        const std::string& fileName) {
-  auto texture = std::make_unique<sf::Texture>();
-  if (!texture->loadFromFile(texturesDirectory + fileName +
-                             textureFileExtension))
+  textures[textureName] = std::make_unique<sf::Texture>();
+
+  if (!textures[textureName]->loadFromFile(texturesDirectory + fileName +
+                                           textureFileExtension))
     window.close();
-  textures[textureName] = std::move(texture);
+}
+
+template <typename T, typename Predicate>
+void Game::removeMarkedObjects(std::vector<T>& objects, Predicate pred) {
+  objects.erase(std::remove_if(objects.begin(), objects.end(), pred),
+                objects.end());
+  objects.shrink_to_fit();
 }
 
 void Game::updateEnemies(const float& deltaTime) {
-  enemies.erase(std::remove_if(enemies.begin(), enemies.end(),
-                               [](const std::unique_ptr<Enemy>& enemy) {
-                                 return enemy->isMarkedForDeletion();
-                               }),
-                enemies.end());
-
-  enemies.shrink_to_fit();
+  removeMarkedObjects(enemies, [](const std::unique_ptr<Enemy>& enemy) {
+    return enemy->isMarkedForDeletion();
+  });
 
   for (auto& enemy : enemies) {
     if (!enemy->getHp()) {
@@ -104,18 +112,14 @@ void Game::updateEnemies(const float& deltaTime) {
       scoreValue += 1 * player->getScoreMultiplier();
     }
 
-    enemy->update(deltaTime, window);
+    enemy->update(deltaTime, window, player->getPosition());
   }
 }
 
 void Game::updateBonuses(const float& deltaTime) {
-  bonuses.erase(std::remove_if(bonuses.begin(), bonuses.end(),
-                               [](const std::unique_ptr<Bonus>& bonus) {
-                                 return bonus->isMarkedForDeletion();
-                               }),
-                bonuses.end());
-
-  bonuses.shrink_to_fit();
+  removeMarkedObjects(bonuses, [](const std::unique_ptr<Bonus>& bonus) {
+    return bonus->isMarkedForDeletion();
+  });
 
   sf::FloatRect playerBounds = player->getGlobalBounds();
 
@@ -135,14 +139,10 @@ void Game::updateBonuses(const float& deltaTime) {
 }
 
 void Game::updateProjectiles(const float& deltaTime) {
-  projectiles.erase(
-      std::remove_if(projectiles.begin(), projectiles.end(),
-                     [](const std::unique_ptr<Projectile>& projectile) {
-                       return projectile->isMarkedMarkedForDeletion();
-                     }),
-      projectiles.end());
-
-  projectiles.shrink_to_fit();
+  removeMarkedObjects(projectiles,
+                      [](const std::unique_ptr<Projectile>& projectile) {
+                        return projectile->isMarkedMarkedForDeletion();
+                      });
 
   sf::FloatRect playerBounds = player->getGlobalBounds();
 
@@ -166,7 +166,8 @@ void Game::updateProjectiles(const float& deltaTime) {
         sf::FloatRect enemyBounds = enemy->getGlobalBounds();
         if (enemyBounds.intersects(projectileBounds)) {
           projectile->markForDeletion();
-          enemy->setHp(enemy->getHp() - 1);
+          enemy->getHp() < 0 ? enemy->setHp(0)
+                             : enemy->setHp(enemy->getHp() - 1);
         }
       }
 
@@ -195,4 +196,33 @@ void Game::updateUi() {
   window.draw(score);
   window.draw(playerHp);
   window.draw(playerPowerUpCount);
+}
+
+void Game::spawnEnemies() {
+  if (enemies.size())
+    enemySpawnCooldown.restart();
+
+  if (enemies.size() || enemySpawnCooldown.getElapsedTime().asSeconds() < 3)
+    return;
+
+  for (int i = 0; i < 5; ++i) {
+    int enemy = randomEnemy(gen);
+
+    sf::Vector2f enemyPosition(randomEnemyPositionX(gen),
+                               randomEnemyPositionY(gen));
+
+    AppearDirection enemyAppearDirection;
+
+    if (enemyPosition.y <= window.getSize().y / 4)
+      enemyAppearDirection = AppearDirection::Top;
+    else if (enemyPosition.x <= window.getSize().x / 2)
+      enemyAppearDirection = AppearDirection::Left;
+    else
+      enemyAppearDirection = AppearDirection::Right;
+
+    enemies.emplace_back(std::make_unique<Enemy>(
+        *textures["enemy" + std::to_string(enemy)], enemyPosition,
+        enemyAppearDirection, 20, window.getSize(),
+        *textures["enemyProjectile"], projectiles, enemy));
+  }
 }

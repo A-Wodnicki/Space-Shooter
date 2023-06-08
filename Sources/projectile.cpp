@@ -4,11 +4,13 @@ Projectile::Projectile(const sf::Texture& texture,
                        const float& speed,
                        const float& angle,
                        const bool& isPlayer,
-                       const sf::Vector2f& startingPosition)
+                       const sf::Vector2f& startingPosition,
+                       const float& rotation)
     : sf::Sprite(texture),
       playerProjectile(isPlayer),
       markedForDeletion(false),
-      bright(false) {
+      bright(false),
+      rotation(rotation) {
   setOrigin(getLocalBounds().width / 2, getLocalBounds().height / 2);
   setRotation(angle);
   setPosition(startingPosition);
@@ -25,6 +27,8 @@ void Projectile::update(const float& deltaTime, sf::RenderWindow& window) {
     flash();
     flashTimer.restart();
   }
+
+  this->rotate(rotation);
 
   window.draw(*this);
 }

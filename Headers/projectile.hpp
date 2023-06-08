@@ -9,7 +9,8 @@ class Projectile : public sf::Sprite {
              const float& speed,
              const float& angle,
              const bool& isPlayer,
-             const sf::Vector2f& startingPosition);
+             const sf::Vector2f& startingPosition,
+             const float& rotation = 0);
 
   void update(const float& deltaTime, sf::RenderWindow& window);
   int getDamage() const;
@@ -26,5 +27,6 @@ class Projectile : public sf::Sprite {
   bool markedForDeletion;
   sf::Clock flashTimer;
   bool bright;
+  float rotation;
 };
 #endif  // PROJECTILE_HPP

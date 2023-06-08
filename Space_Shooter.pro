@@ -27,8 +27,15 @@ CONFIG(debug, debug|release){
 
 DISTFILES += \
     Assets/Images/bonus.png \
+    Assets/Images/enemy1.png \
+    Assets/Images/enemy2.png \
+    Assets/Images/enemy3.png \
+    Assets/Images/enemy4.png \
+    Assets/Images/enemy5.png \
+    Assets/Images/enemy6.png \
     Assets/Images/explosion.png \
     Assets/Images/laserBlue01.png \
+    Assets/Images/laserRed01.png \
     Assets/Images/player.png \
     Assets/fonts/kenvector_future.ttf \
     README.md \

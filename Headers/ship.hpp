@@ -31,7 +31,7 @@ class Ship : public sf::Sprite {
   void moveDown(const float& deltaTime);
   void moveLeft(const float& deltaTime);
 
-  sf::Vector2f targetPositon;
+  sf::Vector2f targetPosition;
   AppearDirection appearDirection;
   bool isAppearing;
 
