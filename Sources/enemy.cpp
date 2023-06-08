@@ -18,7 +18,6 @@ Enemy::Enemy(const sf::Texture& texture,
            projectiles),
       hp(hp),
       markedForDeletion(false),
-      isRetreating(false),
       patternChoice(patternChoice) {
   setScale(2 * getScale().x, 2 * -getScale().y);
 
@@ -31,18 +30,21 @@ void Enemy::update(const float& deltaTime,
                    const sf::Vector2f& playerPosition) {
   Ship::update(deltaTime);
 
-  if (!isAppearing && shootAmount &&
+  if (isAppearing)
+    shootCountdown.restart();
+
+  if (shootCountdown.getElapsedTime().asSeconds() >= 3 && shootAmount &&
       projectileCooldown.getElapsedTime().asSeconds() >= 0.75) {
     switch (patternChoice) {
       case 0:
       default:
         if (shootAmount == 3)
           aimAt = playerPosition;
-        shootAtPoint(aimAt);
+        shootAtPoint(aimAt, 400);
         break;
       case 1:
         aimAt = playerPosition;
-        shootAtPoint(aimAt);
+        shootAtPoint(aimAt, 300);
         break;
       case 2:
         shootCircle(CircleShootPattern::straight);
@@ -61,8 +63,11 @@ void Enemy::update(const float& deltaTime,
     shootAmount--;
   }
 
-  if (!isAppearing && !shootAmount) {
-  }
+  if (shootAmount)
+    retreatCountdown.restart();
+
+  if (retreatCountdown.getElapsedTime().asSeconds() >= 3)
+    retreat(deltaTime, window.getSize());
 
   window.draw(*this);
 }
@@ -83,43 +88,71 @@ bool Enemy::isMarkedForDeletion() const {
   return markedForDeletion;
 }
 
-void Enemy::shootAtPoint(const sf::Vector2f& target) {
+void Enemy::shootAtPoint(const sf::Vector2f& target,
+                         const float& projectileSpeed) {
   float angle =
       std::atan2((target.y - getPosition().y), (target.x - getPosition().x)) +
       M_PI_2;
 
   angle = angle * 180 / M_PI;
 
-  projectiles.emplace_back(std::make_unique<Projectile>(projectile, 300, angle,
-                                                        false, getPosition()));
+  projectiles.emplace_back(std::make_unique<Projectile>(
+      projectile, projectileSpeed, angle, false, getPosition()));
 }
 
 void Enemy::shootCircle(const CircleShootPattern& pattern) {
-  float angle, rotation;
+  float angle, rotation, speed;
 
   for (int i = 0; i < 360; i += 10) {
     switch (pattern) {
       case CircleShootPattern::rotateAll:
+        speed = 200;
         rotation = 0.1;
         angle = i + 10;
         break;
 
       case CircleShootPattern::rotateAllReversed:
+        speed = 200;
         rotation = -0.1;
         angle = i + 10;
         break;
 
       case CircleShootPattern::rotateAlternately:
+        speed = 150;
         rotation = 0.1 * std::pow((-1), i / 10);
         angle = i + 10;
         break;
 
       case CircleShootPattern::straight:
       default:
+        speed = 250;
         rotation = 0;
         angle = i;
     }
     projectiles.emplace_back(std::make_unique<Projectile>(
-        projectile, 300, angle, false, getPosition(), rotation));
+        projectile, speed, angle, false, getPosition(), rotation));
+  }
+}
+
+void Enemy::retreat(const float& deltaTime, const sf::Vector2u& windowSize) {
+  float positionOffset = getPosition().y <= windowSize.y / 4
+                             ? getGlobalBounds().height
+                             : getGlobalBounds().width;
+
+  sf::Vector2f position = getPosition();
+
+  if (getPosition().y <= windowSize.y / 4) {
+    moveUp(deltaTime);
+    position.y += positionOffset;
+  } else if (getPosition().x <= windowSize.x / 2) {
+    moveLeft(deltaTime);
+    position.x += positionOffset;
+  } else {
+    moveRight(deltaTime);
+    position.x -= positionOffset;
+  }
+
+  if (!sf::FloatRect(0, 0, windowSize.x, windowSize.y).contains(position)) {
+    markForDeletion();
   }
 };

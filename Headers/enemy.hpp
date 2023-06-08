@@ -31,20 +31,23 @@ class Enemy : public Ship {
   void markForDeletion();
   bool isMarkedForDeletion() const;
 
-  void shootAtPoint(const sf::Vector2f& target);
+ private:
+  void shootAtPoint(const sf::Vector2f& target, const float& projectileSpeed);
   void shootCircle(const CircleShootPattern& pattern);
 
- private:
+  void retreat(const float& deltaTime, const sf::Vector2u& windowSize);
+
   int hp;
   bool markedForDeletion;
 
-  bool isRetreating;
-
+  sf::Clock shootCountdown;
   sf::Clock projectileCooldown;
 
   int patternChoice;
   int shootAmount;
   sf::Vector2f aimAt;
+
+  sf::Clock retreatCountdown;
 };
 
 #endif  // ENEMY_HPP
