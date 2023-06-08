@@ -59,6 +59,10 @@ class Game {
   std::uniform_real_distribution<float> randomEnemyPositionX;
   std::uniform_real_distribution<float> randomEnemyPositionY;
   sf::Clock enemySpawnCooldown;
+
+  std::uniform_real_distribution<float> chance;
+
+  sf::VertexArray line;
 };
 
 #endif  // GAMEENGINE_HPP

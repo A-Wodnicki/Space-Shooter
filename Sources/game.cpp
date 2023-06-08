@@ -12,8 +12,10 @@ Game::Game()
       score("", font),
       gen(randomDevice()),
       randomEnemy(0, 5),
-      randomEnemyPositionX(0, window.getSize().x),
-      randomEnemyPositionY(0, window.getSize().y / 2) {
+      randomEnemyPositionX(50, window.getSize().x - 50),
+      randomEnemyPositionY(50, window.getSize().y / 2 - 50),
+      chance(0, 1),
+      line(sf::Lines, 2) {
   ::ShowWindow(window.getSystemHandle(), SW_MAXIMIZE);
   window.setFramerateLimit(144);
 
@@ -52,6 +54,9 @@ Game::Game()
   numbersBox.setSize(
       sf::Vector2f(0, playerPowerUpCount.getPosition().y +
                           playerPowerUpCount.getCharacterSize()));
+
+  line[0].position = sf::Vector2f(0, window.getSize().y / 2);
+  line[1].position = sf::Vector2f(window.getSize().x, window.getSize().y / 2);
 }
 
 void Game::loop() {
@@ -110,6 +115,10 @@ void Game::updateEnemies(const float& deltaTime) {
     if (!enemy->getHp()) {
       enemy->markForDeletion();
       scoreValue += 1 * player->getScoreMultiplier();
+      if (chance(gen) < 0.1)
+        bonuses.emplace_back(std::make_unique<Bonus>(
+            *textures["bonus"], chance(gen) < 0.5 ? true : false,
+            enemy->getPosition()));
     }
 
     enemy->update(deltaTime, window, player->getPosition());
@@ -198,6 +207,15 @@ void Game::updateUi() {
   else
     playerHp.setFillColor(sf::Color::White);
 
+  for (size_t i = 0; i < line.getVertexCount(); ++i) {
+    line[i].color.a =
+        255 - 255 * ((player->getGlobalBounds().top - line.getBounds().top -
+                      line.getBounds().height) /
+                     (line.getBounds().top - line.getBounds().height -
+                      player->getGlobalBounds().height));
+  }
+
+  window.draw(line);
   window.draw(numbersBox);
   window.draw(score);
   window.draw(playerHp);

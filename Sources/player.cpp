@@ -33,7 +33,7 @@ void Player::update(const float& deltaTime, sf::RenderWindow& window) {
   if (superCooldown.getElapsedTime().asSeconds() >= 3)
     superOnCooldown = false;
 
-  handleControl(deltaTime);
+  handleControl(deltaTime, window.getSize());
 
   window.draw(*this);
 }
@@ -70,20 +70,25 @@ bool Player::isSuperOnCooldown() const {
   return superOnCooldown;
 }
 
-void Player::handleControl(const float& deltaTime) {
+void Player::handleControl(const float& deltaTime,
+                           const sf::Vector2u& windowSize) {
   if (isAppearing)
     return;
 
-  if (sf::Keyboard::isKeyPressed(moveUpButton))
+  if (sf::Keyboard::isKeyPressed(moveUpButton) &&
+      getPosition().y > windowSize.y / 2 + getGlobalBounds().height / 2)
     moveUp(deltaTime);
 
-  if (sf::Keyboard::isKeyPressed(moveRightButton))
+  if (sf::Keyboard::isKeyPressed(moveRightButton) &&
+      getPosition().x < windowSize.x - getGlobalBounds().width / 2)
     moveRight(deltaTime);
 
-  if (sf::Keyboard::isKeyPressed(moveDownButton))
+  if (sf::Keyboard::isKeyPressed(moveDownButton) &&
+      getPosition().y < windowSize.y - getGlobalBounds().height / 2)
     moveDown(deltaTime);
 
-  if (sf::Keyboard::isKeyPressed(moveLeftButton))
+  if (sf::Keyboard::isKeyPressed(moveLeftButton) &&
+      getPosition().x > getGlobalBounds().width / 2)
     moveLeft(deltaTime);
 
   if ((sf::Keyboard::isKeyPressed(moveLeftButton) ==
@@ -103,6 +108,7 @@ void Player::handleControl(const float& deltaTime) {
   if (sf::Keyboard::isKeyPressed(shootButton3) && powerUpCount &&
       !shootingSuper && !superOnCooldown) {
     scoreMultiplier = 25;
+
     shootingSuper = true;
     superDuration.restart();
   }
@@ -110,12 +116,16 @@ void Player::handleControl(const float& deltaTime) {
   if (sf::Keyboard::isKeyPressed(shootButton1) &&
       projectileCooldown.getElapsedTime().asSeconds() >= 0.075) {
     scoreMultiplier = 100;
+
     shoot(0);
   } else if (sf::Keyboard::isKeyPressed(shootButton2) &&
              projectileCooldown.getElapsedTime().asSeconds() >= 0.075) {
     scoreMultiplier = 50;
+
     shoot(projectileAngle);
+
     projectileAngle += 2;
+
     if (projectileAngle >= 40)
       projectileAngle = 10;
   }

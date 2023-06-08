@@ -67,7 +67,7 @@ void Enemy::update(const float& deltaTime,
     retreatCountdown.restart();
 
   if (retreatCountdown.getElapsedTime().asSeconds() >= 3)
-    retreat(deltaTime, window.getSize());
+    retreat(2 * deltaTime, window.getSize());
 
   window.draw(*this);
 }

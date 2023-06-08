@@ -25,7 +25,7 @@ class Player : public Ship {
   bool isSuperOnCooldown() const;
 
  private:
-  void handleControl(const float& deltaTime);
+  void handleControl(const float& deltaTime, const sf::Vector2u& windowSize);
   void shoot(int angle, int projectilesToShoot = 4);
   void shootSuper();
 
