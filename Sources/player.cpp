@@ -22,6 +22,11 @@ Player::Player(const sf::Texture& texture,
 void Player::update(const float& deltaTime, sf::RenderWindow& window) {
   Ship::update(deltaTime);
 
+  if (getHurtCooldown() < 3)
+    setColor(sf::Color(255, 255, 255, 150));
+  else
+    setColor(sf::Color::White);
+
   if (shootingSuper)
     shootSuper();
 
@@ -39,6 +44,14 @@ int Player::getHp() const {
 
 void Player::setHp(const int& hp) {
   this->hp = hp;
+}
+
+float Player::getHurtCooldown() const {
+  return hurtCooldown.getElapsedTime().asSeconds();
+}
+
+void Player::restartHurtCooldown() {
+  hurtCooldown.restart();
 }
 
 int Player::getScoreMultiplier() const {

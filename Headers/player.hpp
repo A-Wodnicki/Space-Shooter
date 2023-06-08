@@ -14,6 +14,9 @@ class Player : public Ship {
   int getHp() const;
   void setHp(const int& hp);
 
+  float getHurtCooldown() const;
+  void restartHurtCooldown();
+
   int getScoreMultiplier() const;
 
   int getPowerUpCount() const;
@@ -38,6 +41,8 @@ class Player : public Ship {
   int projectileAngle;
 
   int hp;
+  sf::Clock hurtCooldown;
+
   int scoreMultiplier;
 
   int powerUpCount;

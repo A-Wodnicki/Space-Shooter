@@ -156,9 +156,10 @@ void Game::updateProjectiles(const float& deltaTime) {
       projectile->markForDeletion();
 
     if (playerBounds.contains(projectile->getPosition()) &&
-        !projectile->isPlayerOwned()) {
+        !projectile->isPlayerOwned() && player->getHurtCooldown() >= 3) {
       projectile->markForDeletion();
       player->setHp(player->getHp() - 1);
+      player->restartHurtCooldown();
     }
 
     if (projectile->isPlayerOwned())
@@ -190,7 +191,12 @@ void Game::updateUi() {
   if (player->isSuperOnCooldown())
     playerPowerUpCount.setFillColor(sf::Color(255, 255, 255, 100));
   else
-    playerPowerUpCount.setFillColor(sf::Color(255, 255, 255, 255));
+    playerPowerUpCount.setFillColor(sf::Color::White);
+
+  if (player->getHurtCooldown() < 3)
+    playerHp.setFillColor(sf::Color(255, 255, 255, 100));
+  else
+    playerHp.setFillColor(sf::Color::White);
 
   window.draw(numbersBox);
   window.draw(score);

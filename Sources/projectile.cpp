@@ -54,7 +54,7 @@ void Projectile::rotate(const float& angle) {
 
 void Projectile::flash() {
   if (bright)
-    setColor(sf::Color(255, 255, 255, 255));
+    setColor(sf::Color::White);
   else
     setColor(sf::Color(255, 255, 255, 200));
   bright = !bright;
