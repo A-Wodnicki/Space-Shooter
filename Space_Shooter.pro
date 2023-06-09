@@ -7,6 +7,7 @@ SOURCES += \
     Sources/background.cpp \
     Sources/bonus.cpp \
     Sources/enemy.cpp \
+    Sources/explosion.cpp \
     Sources/game.cpp \
     Sources/main.cpp \
     Sources/player.cpp \
@@ -46,6 +47,7 @@ HEADERS += \
     Headers/background.hpp \
     Headers/bonus.hpp \
     Headers/enemy.hpp \
+    Headers/explosion.hpp \
     Headers/game.hpp \
     Headers/player.hpp \
     Headers/projectile.hpp \

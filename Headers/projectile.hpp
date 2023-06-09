@@ -28,5 +28,6 @@ class Projectile : public sf::Sprite {
   sf::Clock flashTimer;
   bool bright;
   float rotation;
+  sf::Clock rotationTimer;
 };
 #endif  // PROJECTILE_HPP

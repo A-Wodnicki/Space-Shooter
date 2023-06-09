@@ -18,7 +18,8 @@ Enemy::Enemy(const sf::Texture& texture,
            projectiles),
       hp(hp),
       markedForDeletion(false),
-      patternChoice(patternChoice) {
+      patternChoice(patternChoice),
+      retreating(false) {
   setScale(2 * getScale().x, 2 * -getScale().y);
 
   this->patternChoice %= 6;
@@ -107,19 +108,19 @@ void Enemy::shootCircle(const CircleShootPattern& pattern) {
     switch (pattern) {
       case CircleShootPattern::rotateAll:
         speed = 200;
-        rotation = 0.1;
+        rotation = 1;
         angle = i + 10;
         break;
 
       case CircleShootPattern::rotateAllReversed:
         speed = 200;
-        rotation = -0.1;
+        rotation = -1;
         angle = i + 10;
         break;
 
       case CircleShootPattern::rotateAlternately:
         speed = 150;
-        rotation = 0.1 * std::pow((-1), i / 10);
+        rotation = 1 * std::pow((-1), i / 10);
         angle = i + 10;
         break;
 
@@ -147,10 +148,20 @@ void Enemy::retreat(const float& deltaTime, const sf::Vector2u& windowSize) {
   } else if (getPosition().x <= windowSize.x / 2) {
     moveLeft(deltaTime);
     position.x += positionOffset;
+    if (!retreating) {
+      isTurning = true;
+      changeAnimationType();
+    }
   } else {
     moveRight(deltaTime);
     position.x -= positionOffset;
+    if (!retreating) {
+      isTurning = true;
+      changeAnimationType();
+    }
   }
+
+  retreating = true;
 
   if (!sf::FloatRect(0, 0, windowSize.x, windowSize.y).contains(position)) {
     markForDeletion();

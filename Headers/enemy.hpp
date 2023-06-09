@@ -48,6 +48,7 @@ class Enemy : public Ship {
   sf::Vector2f aimAt;
 
   sf::Clock retreatCountdown;
+  bool retreating;
 };
 
 #endif  // ENEMY_HPP

@@ -28,7 +28,10 @@ void Projectile::update(const float& deltaTime, sf::RenderWindow& window) {
     flashTimer.restart();
   }
 
-  this->rotate(rotation);
+  if (rotationTimer.getElapsedTime().asSeconds() >= 0.1) {
+    rotationTimer.restart();
+    this->rotate(rotation);
+  }
 
   window.draw(*this);
 }
