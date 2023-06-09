@@ -91,20 +91,7 @@ void Game::loop() {
       if (event.type == sf::Event::Closed)
         window.close();
       if (event.type == sf::Event::TextEntered) {
-        if (gameState == GameState::GameOver) {
-          if (std::isalpha(event.text.unicode) &&
-              nameInput.getString().getSize() < 3) {
-            nameInput.setString(nameInput.getString() + event.text.unicode);
-          } else if (event.text.unicode == 8 &&
-                     !nameInput.getString().isEmpty()) {
-            std::string newInput = nameInput.getString();
-            newInput.pop_back();
-            nameInput.setString(newInput);
-          }
-          nameInput.setPosition(
-              window.getSize().x / 2 - nameInput.getGlobalBounds().width / 2,
-              nameInput.getPosition().y);
-        }
+        handleNameInput(event);
       }
 
       if (event.type == sf::Event::KeyPressed)
@@ -113,39 +100,7 @@ void Game::loop() {
             window.close();
           if (gameState == GameState::GameOver &&
               nameInput.getString().getSize() == 3) {
-            saveScore();
-            gameState = GameState::Scores;
-
-            std::vector<ScoreEntry> scores = readScores();
-
-            for (size_t i = 0; i < scores.size(); ++i) {
-              positionText.setString(positionText.getString() +
-                                     std::to_string(i + 1) + ".\n");
-              nameText.setString(nameText.getString() + scores[i].name + "\n");
-              scoreText.setString(scoreText.getString() +
-                                  std::to_string(scores[i].score) + "\n");
-            }
-
-            nameText.setPosition(positionText.getGlobalBounds().width, 0);
-            scoreText.setPosition(positionText.getGlobalBounds().width +
-                                      scoreText.getGlobalBounds().width,
-                                  0);
-
-            float totalWidth = positionText.getGlobalBounds().width +
-                               nameText.getGlobalBounds().width +
-                               scoreText.getGlobalBounds().width;
-
-            float centerX = (window.getSize().x - totalWidth) / 2;
-            float centerY =
-                (window.getSize().y - positionText.getGlobalBounds().height) /
-                2;
-
-            positionText.move(centerX, centerY);
-            nameText.move(centerX + positionText.getGlobalBounds().width,
-                          centerY);
-            scoreText.move(centerX + positionText.getGlobalBounds().width +
-                               nameText.getGlobalBounds().width,
-                           centerY);
+            transitionToScores();
           }
         }
     }
@@ -375,6 +330,46 @@ void Game::spawnEnemies() {
   }
 }
 
+void Game::handleNameInput(const sf::Event& event) {
+  if (gameState != GameState::GameOver)
+    return;
+
+  unsigned int backspaceUnicode = 8;
+
+  if (std::isalpha(event.text.unicode) && nameInput.getString().getSize() < 3)
+    nameInput.setString(nameInput.getString() + event.text.unicode);
+  else if (event.text.unicode == backspaceUnicode &&
+           !nameInput.getString().isEmpty()) {
+    std::string newInput = nameInput.getString();
+    newInput.pop_back();
+    nameInput.setString(newInput);
+  }
+
+  nameInput.setPosition(
+      window.getSize().x / 2 - nameInput.getGlobalBounds().width / 2,
+      nameInput.getPosition().y);
+}
+
+std::vector<ScoreEntry> Game::readScores() {
+  std::vector<ScoreEntry> scores;
+
+  std::ifstream file("scores.txt");
+  if (file.is_open()) {
+    std::string line;
+    while (std::getline(file, line)) {
+      std::istringstream iss(line);
+      std::string name;
+      int score;
+      if (iss >> name >> score)
+        scores.emplace_back(ScoreEntry{name, score});
+    }
+    file.close();
+  } else
+    std::cerr << "Could not open file\n";
+
+  return scores;
+}
+
 void Game::saveScore() {
   std::vector<ScoreEntry> scores = readScores();
 
@@ -398,22 +393,36 @@ void Game::saveScore() {
     std::cerr << "Could not open file\n";
 }
 
-std::vector<ScoreEntry> Game::readScores() {
-  std::vector<ScoreEntry> scores;
+void Game::transitionToScores() {
+  saveScore();
+  gameState = GameState::Scores;
 
-  std::ifstream file("scores.txt");
-  if (file.is_open()) {
-    std::string line;
-    while (std::getline(file, line)) {
-      std::istringstream iss(line);
-      std::string name;
-      int score;
-      if (iss >> name >> score)
-        scores.emplace_back(ScoreEntry{name, score});
-    }
-    file.close();
-  } else
-    std::cerr << "Could not open file\n";
+  std::vector<ScoreEntry> scores = readScores();
 
-  return scores;
+  for (size_t i = 0; i < scores.size(); ++i) {
+    positionText.setString(positionText.getString() + std::to_string(i + 1) +
+                           ".\n");
+    nameText.setString(nameText.getString() + scores[i].name + "\n");
+    scoreText.setString(scoreText.getString() +
+                        std::to_string(scores[i].score) + "\n");
+  }
+
+  nameText.setPosition(positionText.getGlobalBounds().width, 0);
+  scoreText.setPosition(
+      positionText.getGlobalBounds().width + scoreText.getGlobalBounds().width,
+      0);
+
+  float totalWidth = positionText.getGlobalBounds().width +
+                     nameText.getGlobalBounds().width +
+                     scoreText.getGlobalBounds().width;
+
+  float centerX = (window.getSize().x - totalWidth) / 2;
+  float centerY =
+      (window.getSize().y - positionText.getGlobalBounds().height) / 2;
+
+  positionText.move(centerX, centerY);
+  nameText.move(centerX + positionText.getGlobalBounds().width, centerY);
+  scoreText.move(centerX + positionText.getGlobalBounds().width +
+                     nameText.getGlobalBounds().width,
+                 centerY);
 }

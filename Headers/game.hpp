@@ -39,8 +39,10 @@ class Game {
 
   void spawnEnemies();
 
-  void saveScore();
+  void handleNameInput(const sf::Event& event);
   std::vector<ScoreEntry> readScores();
+  void saveScore();
+  void transitionToScores();
 
   sf::RenderWindow window;
   sf::Clock clock;
