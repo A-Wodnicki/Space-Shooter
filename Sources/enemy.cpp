@@ -31,44 +31,9 @@ void Enemy::update(const float& deltaTime,
                    const sf::Vector2f& playerPosition) {
   Ship::update(deltaTime);
 
-  if (appearing)
-    shootCountdown.restart();
+  shoot(playerPosition);
 
-  if (shootCountdown.getElapsedTime().asSeconds() >= 3 && shootAmount &&
-      projectileCooldown.getElapsedTime().asSeconds() >= 1.f / 3) {
-    switch (patternChoice) {
-      case 0:
-      default:
-        if (shootAmount == 3)
-          aimAt = playerPosition;
-        shootAtPoint(aimAt, 400);
-        break;
-      case 1:
-        aimAt = playerPosition;
-        shootAtPoint(aimAt, 300);
-        break;
-      case 2:
-        shootCircle(CircleShootPattern::straight);
-        break;
-      case 3:
-        shootCircle(CircleShootPattern::rotateAll);
-        break;
-      case 4:
-        shootCircle(CircleShootPattern::rotateAllReversed);
-        break;
-      case 5:
-        shootCircle(CircleShootPattern::rotateAlternately);
-        break;
-    }
-    projectileCooldown.restart();
-    shootAmount--;
-  }
-
-  if (shootAmount)
-    retreatCountdown.restart();
-
-  if (retreatCountdown.getElapsedTime().asSeconds() >= 3)
-    retreat(2 * deltaTime, window.getSize());
+  retreat(2 * deltaTime, window.getSize());
 
   window.draw(*this);
 }
@@ -87,6 +52,42 @@ void Enemy::markForDeletion() {
 
 bool Enemy::isMarkedForDeletion() const {
   return markedForDeletion;
+}
+
+void Enemy::shoot(const sf::Vector2f& playerPosition) {
+  if (appearing)
+    shootCountdown.restart();
+
+  if (shootCountdown.getElapsedTime().asSeconds() < 3 || !shootAmount ||
+      projectileCooldown.getElapsedTime().asSeconds() < 1.f / 3)
+    return;
+
+  switch (patternChoice) {
+    case 0:
+    default:
+      if (shootAmount == 3)
+        aimAt = playerPosition;
+      shootAtPoint(aimAt, 400);
+      break;
+    case 1:
+      aimAt = playerPosition;
+      shootAtPoint(aimAt, 300);
+      break;
+    case 2:
+      shootCircle(CircleShootPattern::straight);
+      break;
+    case 3:
+      shootCircle(CircleShootPattern::rotateAll);
+      break;
+    case 4:
+      shootCircle(CircleShootPattern::rotateAllReversed);
+      break;
+    case 5:
+      shootCircle(CircleShootPattern::rotateAlternately);
+      break;
+  }
+  projectileCooldown.restart();
+  shootAmount--;
 }
 
 void Enemy::shootAtPoint(const sf::Vector2f& target,
@@ -136,6 +137,12 @@ void Enemy::shootCircle(const CircleShootPattern& pattern) {
 }
 
 void Enemy::retreat(const float& deltaTime, const sf::Vector2u& windowSize) {
+  if (shootAmount)
+    retreatCountdown.restart();
+
+  if (retreatCountdown.getElapsedTime().asSeconds() < 3)
+    return;
+
   float positionOffset = getPosition().y <= windowSize.y / 4
                              ? getGlobalBounds().height
                              : getGlobalBounds().width;

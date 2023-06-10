@@ -32,6 +32,7 @@ class Enemy : public Ship {
   bool isMarkedForDeletion() const;
 
  private:
+  void shoot(const sf::Vector2f& playerPosition);
   void shootAtPoint(const sf::Vector2f& target, const float& projectileSpeed);
   void shootCircle(const CircleShootPattern& pattern);
 
