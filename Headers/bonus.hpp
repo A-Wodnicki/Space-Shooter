@@ -7,14 +7,20 @@ class Bonus : public sf::Sprite {
   Bonus(const sf::Texture& texture,
         const bool& powerUp,
         const sf::Vector2f& startingPosition);
+
   void update(const float& deltaTime, sf::RenderWindow& window);
+
   bool isMarkedForDeletion();
   void markForDeletion();
+
   bool isPowerUp() const;
 
  private:
+  //  if powerUp is true bonus adds special ammo, else restores HP
   bool powerUp;
+
   sf::Vector2f velocity;
+
   bool markedForDeletion;
 };
 

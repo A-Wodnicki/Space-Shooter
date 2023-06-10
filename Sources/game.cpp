@@ -244,7 +244,7 @@ void Game::updateProjectiles(const float& deltaTime) {
         projectileBounds.top - projectileBounds.height > window.getSize().y)
       projectile->markForDeletion();
 
-    if (playerBounds.contains(projectile->getPosition()) &&
+    if (playerBounds.contains(projectile->getPosition()) && player->getHp() &&
         !projectile->isPlayerOwned() && player->getHurtCooldown() >= 3) {
       projectile->markForDeletion();
       player->setHp(player->getHp() - 1);
@@ -364,8 +364,7 @@ std::vector<ScoreEntry> Game::readScores() {
         scores.emplace_back(ScoreEntry{name, score});
     }
     file.close();
-  } else
-    std::cerr << "Could not open file\n";
+  }
 
   return scores;
 }
@@ -389,8 +388,10 @@ void Game::saveScore() {
       file << entry.name << " " << entry.score << "\n";
     }
     file.close();
-  } else
-    std::cerr << "Could not open file\n";
+  } else {
+    std::cerr << "Could not open file scores.txt\n";
+    window.close();
+  }
 }
 
 void Game::transitionToScores() {

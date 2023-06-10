@@ -11,6 +11,7 @@ class Player : public Ship {
          std::vector<std::unique_ptr<Projectile>>& projectiles);
 
   void update(const float& deltaTime, sf::RenderWindow& window);
+
   int getHp() const;
   void setHp(const int& hp);
 

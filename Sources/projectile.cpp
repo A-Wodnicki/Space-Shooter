@@ -7,10 +7,10 @@ Projectile::Projectile(const sf::Texture& texture,
                        const sf::Vector2f& startingPosition,
                        const float& rotation)
     : sf::Sprite(texture),
+      rotation(rotation),
       playerProjectile(isPlayer),
       markedForDeletion(false),
-      bright(false),
-      rotation(rotation) {
+      bright(false) {
   setOrigin(getLocalBounds().width / 2, getLocalBounds().height / 2);
   setRotation(angle);
   setPosition(startingPosition);
@@ -21,18 +21,9 @@ Projectile::Projectile(const sf::Texture& texture,
 }
 
 void Projectile::update(const float& deltaTime, sf::RenderWindow& window) {
+  this->rotate(rotation);
   move(velocity * deltaTime);
-
-  if (flashTimer.getElapsedTime().asSeconds() >= 0.01) {
-    flash();
-    flashTimer.restart();
-  }
-
-  if (rotationTimer.getElapsedTime().asSeconds() >= 0.1) {
-    rotationTimer.restart();
-    this->rotate(rotation);
-  }
-
+  flash();
   window.draw(*this);
 }
 
@@ -49,6 +40,14 @@ void Projectile::markForDeletion() {
 }
 
 void Projectile::rotate(const float& angle) {
+  if (!angle)
+    return;
+
+  if (rotationTimer.getElapsedTime().asSeconds() < 0.1)
+    return;
+
+  rotationTimer.restart();
+
   sf::Transform transform;
   transform.rotate(angle);
   velocity = transform.transformPoint(velocity);
@@ -56,9 +55,14 @@ void Projectile::rotate(const float& angle) {
 }
 
 void Projectile::flash() {
-  if (bright)
-    setColor(sf::Color::White);
-  else
-    setColor(sf::Color(255, 255, 255, 200));
+  if (flashTimer.getElapsedTime().asSeconds() < 0.1)
+    return;
+
+  flashTimer.restart();
+
+  sf::Color color = bright ? sf::Color::White : sf::Color(255, 255, 255, 200);
+
+  setColor(color);
+
   bright = !bright;
 }

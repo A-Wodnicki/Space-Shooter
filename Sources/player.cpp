@@ -5,8 +5,7 @@ Player::Player(const sf::Texture& texture,
                const sf::Vector2u& windowSize,
                std::vector<std::unique_ptr<Projectile> >& projectiles)
     : Ship(texture,
-           {static_cast<float>(windowSize.x / 2),
-            static_cast<float>(windowSize.y / 4 * 3)},
+           sf::Vector2f(windowSize.x / 2, windowSize.y / 4 * 3),
            AppearDirection::Bottom,
            windowSize,
            300,
@@ -22,13 +21,12 @@ Player::Player(const sf::Texture& texture,
 void Player::update(const float& deltaTime, sf::RenderWindow& window) {
   Ship::update(deltaTime);
 
-  if (getHurtCooldown() < 3)
-    setColor(sf::Color(255, 255, 255, 150));
-  else
-    setColor(sf::Color::White);
+  sf::Color color =
+      getHurtCooldown() < 3 ? sf::Color(255, 255, 255, 150) : sf::Color::White;
 
-  if (shootingSuper)
-    shootSuper();
+  setColor(color);
+
+  shootSuper();
 
   if (superCooldown.getElapsedTime().asSeconds() >= 3)
     superOnCooldown = false;
@@ -72,7 +70,7 @@ bool Player::isSuperOnCooldown() const {
 
 void Player::handleControl(const float& deltaTime,
                            const sf::Vector2u& windowSize) {
-  if (isAppearing)
+  if (appearing)
     return;
 
   if (sf::Keyboard::isKeyPressed(moveUpButton) &&
@@ -93,45 +91,41 @@ void Player::handleControl(const float& deltaTime,
 
   if ((sf::Keyboard::isKeyPressed(moveLeftButton) ==
        sf::Keyboard::isKeyPressed(moveRightButton)) &&
-      isTurning) {
-    isTurning = false;
+      turning) {
+    turning = false;
     changeAnimationType();
   }
 
   if ((sf::Keyboard::isKeyPressed(moveLeftButton) !=
        sf::Keyboard::isKeyPressed(moveRightButton)) &&
-      !isTurning) {
-    isTurning = true;
+      !turning) {
+    turning = true;
     changeAnimationType();
   }
 
   if (sf::Keyboard::isKeyPressed(shootButton3) && powerUpCount &&
       !shootingSuper && !superOnCooldown) {
     scoreMultiplier = 25;
-
     shootingSuper = true;
     superDuration.restart();
   }
 
-  if (sf::Keyboard::isKeyPressed(shootButton1) &&
-      projectileCooldown.getElapsedTime().asSeconds() >= 0.075) {
+  if (projectileCooldown.getElapsedTime().asSeconds() < 0.075)
+    return;
+
+  projectileCooldown.restart();
+
+  if (sf::Keyboard::isKeyPressed(shootButton1)) {
     scoreMultiplier = 100;
-
     shoot(0);
-  } else if (sf::Keyboard::isKeyPressed(shootButton2) &&
-             projectileCooldown.getElapsedTime().asSeconds() >= 0.075) {
+  } else if (sf::Keyboard::isKeyPressed(shootButton2)) {
     scoreMultiplier = 50;
-
     shoot(projectileAngle);
 
     projectileAngle += 2;
-
     if (projectileAngle >= 40)
       projectileAngle = 10;
   }
-
-  if (projectileCooldown.getElapsedTime().asSeconds() >= 0.075)
-    projectileCooldown.restart();
 }
 
 void Player::shoot(int angle, int projectilesToShoot) {
@@ -149,16 +143,21 @@ void Player::shoot(int angle, int projectilesToShoot) {
 }
 
 void Player::shootSuper() {
-  if (superDuration.getElapsedTime().asSeconds() >= 1) {
-    shootingSuper = false;
-    superCooldown.restart();
-    superOnCooldown = true;
-    powerUpCount--;
-  }
+  if (!shootingSuper)
+    return;
 
   if (projectileCooldown.getElapsedTime().asSeconds() < 0.075)
     return;
 
-  shoot(80, 40);
   projectileCooldown.restart();
+
+  shoot(80, 40);
+
+  if (superDuration.getElapsedTime().asSeconds() < 1)
+    return;
+
+  shootingSuper = false;
+  superCooldown.restart();
+  superOnCooldown = true;
+  powerUpCount--;
 }

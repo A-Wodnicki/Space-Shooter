@@ -8,7 +8,6 @@ class Background {
   Background(const sf::Vector2u& windowSize, sf::Texture& texture);
 
   void update(const float& deltaTime, sf::RenderWindow& window);
-  void setScrollSpeed(const float& speed);
 
  private:
   void scroll(const float& deltaTime);

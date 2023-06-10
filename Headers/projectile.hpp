@@ -13,21 +13,26 @@ class Projectile : public sf::Sprite {
              const float& rotation = 0);
 
   void update(const float& deltaTime, sf::RenderWindow& window);
-  int getDamage() const;
+
   bool isPlayerOwned() const;
+
   bool isMarkedMarkedForDeletion() const;
   void markForDeletion();
-  void rotate(const float& angle);
 
  private:
+  void rotate(const float& angle);
+
   void flash();
 
   sf::Vector2f velocity;
-  bool playerProjectile;
-  bool markedForDeletion;
-  sf::Clock flashTimer;
-  bool bright;
+
   float rotation;
   sf::Clock rotationTimer;
+
+  bool playerProjectile;
+  bool markedForDeletion;
+
+  bool bright;
+  sf::Clock flashTimer;
 };
 #endif  // PROJECTILE_HPP

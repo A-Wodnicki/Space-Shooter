@@ -33,15 +33,15 @@ class Ship : public sf::Sprite {
 
   sf::Vector2f targetPosition;
   AppearDirection appearDirection;
-  bool isAppearing;
+  bool appearing;
 
   int frames;
-  bool isTurning;
+  bool turning;
+  bool flippedHorizontally;
   std::vector<sf::IntRect> idleAnimationFrames;
   std::vector<sf::IntRect> turningAnimationFrames;
   std::vector<sf::IntRect>::iterator currentFrame;
   sf::Clock animationTimer;
-  bool isFlippedHorizontally;
 
   float speed;
 

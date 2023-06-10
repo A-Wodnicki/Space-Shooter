@@ -31,11 +31,11 @@ void Enemy::update(const float& deltaTime,
                    const sf::Vector2f& playerPosition) {
   Ship::update(deltaTime);
 
-  if (isAppearing)
+  if (appearing)
     shootCountdown.restart();
 
   if (shootCountdown.getElapsedTime().asSeconds() >= 3 && shootAmount &&
-      projectileCooldown.getElapsedTime().asSeconds() >= 0.75) {
+      projectileCooldown.getElapsedTime().asSeconds() >= 1.f / 3) {
     switch (patternChoice) {
       case 0:
       default:
@@ -149,14 +149,14 @@ void Enemy::retreat(const float& deltaTime, const sf::Vector2u& windowSize) {
     moveLeft(deltaTime);
     position.x += positionOffset;
     if (!retreating) {
-      isTurning = true;
+      turning = true;
       changeAnimationType();
     }
   } else {
     moveRight(deltaTime);
     position.x -= positionOffset;
     if (!retreating) {
-      isTurning = true;
+      turning = true;
       changeAnimationType();
     }
   }
